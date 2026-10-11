@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Personnel Directory | Defense Logistics')}"></head>
+<body>
+    <div th:replace="~{fragments/layout :: page(~{::content}, 'personnel')}">
+        <div th:fragment="content">
+            
+            <div class="card" th:if="${session.role == 'ADMIN'}">
+                <div class="flex-header">
+                    <h3 class="card-title" style="margin:0;">Register New Service Member</h3>
+                </div>
+                <form action="/personnel/create" method="post" class="form-grid">
+                    <div class="form-group">
+                        <label>Service Number</label>
+                        <input type="text" name="serviceNumber" class="form-control" required placeholder="e.g. SN-4029">
+                    </div>
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" name="fullName" class="form-control" required placeholder="Capt. Alex Turner">
+                    </div>
+                    <div class="form-group">
+                        <label>Role / Specialization</label>
+                        <input type="text" name="role" class="form-control" required placeholder="Logistics Officer">
+                    </div>
+                    <div class="form-group">
+                        <label>Assigned Unit</label>
+                        <select name="unitId" class="form-control" required>
+                            <option value="">Select available unit</option>
+                            <option th:each="unit : ${availableUnits}" th:value="${unit['id']}" th:text="${unit['name'] + ' (' + unit['code'] + ') - ' + unit['location']}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Deployment Status</label>
+                        <select name="availabilityStatus" class="form-control">
+                            <option value="AVAILABLE">AVAILABLE</option>
+                            <option value="ALLOCATED">ALLOCATED</option>
+                            <option value="ON_LEAVE">ON LEAVE</option>
+                        </select>
+                    </div>
+                    <input type="hidden" name="posting" value="Station Headquarters">
+                    <button type="submit" class="btn btn-primary">Save Personnel</button>
+                </form>
+            </div>
+            
+            <div class="card">
+                <div class="table-toolbar">
+                    <h3 class="card-title">Personnel Roster &amp; Directory</h3>
+                </div>
+                <div class="table-scroll"><table id="personnel-table" class="table-dark">
+                    <thead>
+                        <tr>
+                            <th>Service #</th>
+                            <th>Name</th>
+                            <th>Specialization</th>
+                            <th>Assigned Unit / Location</th>
+                            <th>Station Posting</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="p : ${personnelList}">
+                            <td th:text="${p['serviceNumber']}"></td>
+                            <td>
+                                <a th:if="${session.role == 'ADMIN'}" class="person-link" th:href="@{/personnel/{id}(id=${p['id']})}" th:text="${p['fullName']}"></a>
+                                <span th:unless="${session.role == 'ADMIN'}" th:text="${p['fullName']}"></span>
+                            </td>
+                            <td th:text="${p['role']}"></td>
+                            <td th:text="${(p['unitCode'] ?: 'Unit ' + p['unitId']) + ' &bull; ' + (p['unitLocation'] ?: p['unitName'] ?: 'HQ')}"></td>
+                            <td th:text="${p['posting']}"></td>
+                            <td>
+                                <form th:if="${session.role == 'ADMIN'}" th:action="@{/personnel/{id}/availability(id=${p['id']})}" method="post" class="form-actions">
+                                    <select name="status" class="form-control" style="min-height:34px; width:135px;">
+                                        <option value="AVAILABLE" th:selected="${p['availabilityStatus'] == 'AVAILABLE'}">Available</option>
+                                        <option value="ALLOCATED" th:selected="${p['availabilityStatus'] == 'ALLOCATED'}">Allocated</option>
+                                        <option value="ON_LEAVE" th:selected="${p['availabilityStatus'] == 'ON_LEAVE'}">On leave</option>
+                                    </select>
+                                    <button class="btn btn-secondary btn-compact" type="submit">Update</button>
+                                </form>
+                                <span th:unless="${session.role == 'ADMIN'}" th:class="${p['availabilityStatus'] == 'AVAILABLE' ? 'badge badge-green' : 'badge badge-yellow'}" th:text="${p['availabilityStatus']}"></span>
+                            </td>
+                        </tr>
+                        <tr class="empty-state" th:if="${personnelList == null or personnelList.isEmpty()}"><td colspan="6">No personnel records found in this directory.</td></tr>
+                    </tbody>
+                </table></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

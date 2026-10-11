@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Request Access | Defense Logistics')}"></head>
+<body class="auth-page">
+    <div class="theme-switcher auth-theme-switcher" role="group" aria-label="Color theme">
+        <button type="button" class="theme-option" data-theme-choice="light">Light</button>
+        <button type="button" class="theme-option" data-theme-choice="dark">Dark</button>
+        <button type="button" class="theme-option" data-theme-choice="system">System</button>
+    </div>
+    <main class="auth-shell">
+        <section class="auth-intro" aria-label="Defense Logistics Overview">
+            <div>
+                <a class="brand" href="/"><span class="brand-mark">DL</span><span>DEF-<strong>LOGIX</strong><small>Defense Logistics</small></span></a>
+                <h1>Secure Operations &amp; Supply Portal</h1>
+                <p>Access is restricted to authorized military personnel registered in the unit directory.</p>
+            </div>
+            <div class="auth-footnote">Personnel verification required for all requests</div>
+        </section>
+        <section class="auth-card">
+            <p class="eyebrow">Personnel Verification</p>
+            <h2>Request Workspace Access</h2>
+            <p>Your Service ID and Full Name will be validated against active personnel records before review.</p>
+            <div th:if="${errorMessage}" class="alert alert-error" role="alert" th:text="${errorMessage}"></div>
+            <form action="/signup" method="post" class="auth-form">
+                <div class="form-group">
+                    <label>Full Name (as listed in directory)</label>
+                    <input type="text" name="fullname" class="form-control" required placeholder="e.g. John Doe">
+                </div>
+                <div class="form-group">
+                    <label>Official Service ID / Number</label>
+                    <input type="text" name="username" class="form-control" required minlength="3" placeholder="e.g. SN-12345" autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" class="form-control" required minlength="8" autocomplete="new-password" placeholder="Minimum 8 characters">
+                    <span class="section-note">Must be at least 8 characters.</span>
+                </div>
+                <div class="form-group">
+                    <label>Operational Unit / Duty Context <span class="section-note">Optional</span></label>
+                    <input type="text" name="requestDetails" class="form-control" maxlength="500" placeholder="Unit assignment or duty requirements">
+                </div>
+                <button type="submit" class="btn btn-primary auth-submit">Verify &amp; Request Access</button>
+            </form>
+            <p class="auth-alt">Already registered? <a href="/login">Sign in to console</a></p>
+        </section>
+    </main>
+</body>
+</html>

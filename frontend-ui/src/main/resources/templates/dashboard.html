@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Dashboard | Defense Logistics')}"></head>
+<body>
+    <div th:replace="~{fragments/layout :: page(~{::content}, 'dashboard')}">
+        <div th:fragment="content">
+            <div class="grid-3">
+                <div class="card stat-card">
+                    <h3 class="card-title">Active Operational Units</h3>
+                    <div class="stat-value" th:text="${summary.totalUnits}">0</div>
+                    <p class="stat-subtitle">Operational battalions and bases in service</p>
+                </div>
+                <div class="card stat-card" style="--metric-accent: var(--accent-blue);">
+                    <h3 class="card-title">Assigned Personnel</h3>
+                    <div class="stat-value" th:text="${summary.totalPersonnel}">0</div>
+                    <p class="stat-subtitle">Service members currently deployed or on active duty</p>
+                </div>
+                <div class="card stat-card" style="--metric-accent: var(--accent-yellow);">
+                    <h3 class="card-title">Pending Supply Requests</h3>
+                    <div class="stat-value" th:text="${summary.pendingRequests}">0</div>
+                    <p class="stat-subtitle">Requisitions awaiting command authorization</p>
+                </div>
+            </div>
+            
+            <div class="card" th:if="${session.role == 'ADMIN'}">
+                <div class="flex-header">
+                    <h3 class="card-title" style="margin:0;">Register New Military Unit</h3>
+                </div>
+                <form action="/units/create" method="post" class="form-grid">
+                    <div class="form-group">
+                        <label>Unit Code</label>
+                        <input type="text" name="code" class="form-control" required placeholder="e.g. INF-101">
+                    </div>
+                    <div class="form-group">
+                        <label>Unit Name</label>
+                        <input type="text" name="name" class="form-control" required placeholder="101st Infantry Battalion">
+                    </div>
+                    <div class="form-group">
+                        <label>Base / Location</label>
+                        <input type="text" name="location" class="form-control" required placeholder="Forward Operating Base Alpha">
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select name="status" class="form-control">
+                            <option value="ACTIVE">ACTIVE</option>
+                            <option value="INACTIVE">INACTIVE</option>
+                            <option value="DEPLOYED">DEPLOYED</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create Unit</button>
+                </form>
+            </div>
+            
+            <div class="card">
+                <div class="table-toolbar">
+                    <h3 class="card-title">Registered Units &amp; Command Bases</h3>
+                </div>
+                <div class="table-scroll"><table id="unit-table" class="table-dark">
+                    <thead>
+                        <tr>
+                            <th>Unit Code</th>
+                            <th>Unit Name</th>
+                            <th>Station / Location</th>
+                            <th>Operating Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="unit : ${units}">
+                            <td th:text="${unit.code}"></td>
+                            <td th:text="${unit.name}"></td>
+                            <td th:text="${unit.location}"></td>
+                            <td>
+                                <form th:if="${session.role == 'ADMIN'}" th:action="@{/units/{id}/status(id=${unit['id']})}" method="post" class="form-actions">
+                                    <select name="status" class="form-control" style="min-height:34px; width:135px;">
+                                        <option value="ACTIVE" th:selected="${unit['status'] == 'ACTIVE'}">ACTIVE</option>
+                                        <option value="DEPLOYED" th:selected="${unit['status'] == 'DEPLOYED'}">DEPLOYED</option>
+                                        <option value="INACTIVE" th:selected="${unit['status'] == 'INACTIVE'}">INACTIVE</option>
+                                    </select>
+                                    <button class="btn btn-secondary btn-compact" type="submit">Update</button>
+                                </form>
+                                <span th:unless="${session.role == 'ADMIN'}" th:class="${unit['status'] == 'ACTIVE' ? 'badge badge-green' : (unit['status'] == 'DEPLOYED' ? 'badge badge-yellow' : 'badge')}" th:text="${unit['status']}"></span>
+                            </td>
+                        </tr>
+                        <tr class="empty-state" th:if="${units == null or units.isEmpty()}"><td colspan="4">No military units have been registered in the system yet.</td></tr>
+                    </tbody>
+                </table></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

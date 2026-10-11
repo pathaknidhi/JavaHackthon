@@ -1,0 +1,6 @@
+com\defense\logistics\frontend\controller\WebController.class
+com\defense\logistics\frontend\service\BackendClientService$OperationResult.class
+com\defense\logistics\frontend\service\BackendClientService$LoginResult.class
+com\defense\logistics\frontend\controller\NavigationAdvice.class
+com\defense\logistics\frontend\FrontendApplication.class
+com\defense\logistics\frontend\service\BackendClientService.class

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Fleet Matrix | DEF-LOGIX')}"></head>
+<body>
+    <div th:replace="~{fragments/layout :: page(~{::content}, 'fleet')}">
+        <div th:fragment="content">
+            <div class="card" th:if="${session.role == 'ADMIN'}">
+                <div class="flex-header"><h3 class="card-title" style="margin:0;">Register New Fleet Vehicle</h3></div>
+                <form action="/vehicles/create" method="post" class="form-grid form-grid-wide">
+                    <div class="form-group" style="margin:0;"><label>Vehicle Reg #</label><input type="text" name="registrationNumber" class="form-control" required placeholder="e.g. TRK-104"></div>
+                    <div class="form-group" style="margin:0;">
+                        <label>Assigned Unit</label>
+                        <select name="unitId" class="form-control" required>
+                            <option value="">Select unit</option>
+                            <option th:each="unit : ${availableUnits}" th:value="${unit['id']}" th:text="${unit['name'] + ' (' + unit['code'] + ')'}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin:0;"><label>Vehicle Type</label><select name="vehicleType" class="form-control"><option value="TRUCK">TRUCK</option><option value="JEEP">JEEP</option><option value="ARMORED">ARMORED</option><option value="AIR">AIR</option><option value="NAVAL">NAVAL</option></select></div>
+                    <div class="form-group" style="margin:0;"><label>Station / Base</label><input type="text" name="location" class="form-control" required placeholder="Base Camp Alpha"></div>
+                    <div class="form-group" style="margin:0;"><label>Condition</label><select name="condition" class="form-control"><option value="NEW">NEW</option><option value="GOOD">GOOD</option><option value="FAIR">FAIR</option><option value="POOR">POOR</option><option value="BROKEN">BROKEN</option></select></div>
+                    <div class="form-group" style="margin:0;">
+                        <label>Operational Status</label>
+                        <select name="operationalStatus" class="form-control"><option value="AVAILABLE">AVAILABLE</option><option value="UNDER_MAINTENANCE">MAINTENANCE</option><option value="ALLOCATED">ALLOCATED</option></select>
+                    </div>
+                    <div class="form-group" style="margin:0;">
+                        <label>Assigned Driver</label>
+                        <select name="driverPersonnelId" class="form-control">
+                            <option value="">Unassigned (Optional)</option>
+                            <option th:each="p : ${personnelList}" th:value="${p['id']}" th:text="${p['fullName'] + ' (' + p['serviceNumber'] + ')'}"></option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Vehicle</button>
+                </form>
+            </div>
+            <div class="card">
+                <div class="table-toolbar"><h3 class="card-title">Fleet Inventory &amp; Tracking</h3><div class="table-search"><input class="form-control" type="search" placeholder="Filter fleet" aria-label="Filter fleet" data-table-filter="#fleet-table" data-result-count="#fleet-filter-count"></div><span id="fleet-filter-count" class="filter-count"></span></div>
+                <div class="table-scroll"><table id="fleet-table" class="table-dark">
+                    <thead><tr><th>Reg #</th><th>Type</th><th>Location</th><th>Condition</th><th>Assigned Driver</th><th>Status</th></tr></thead>
+                    <tbody>
+                        <tr th:each="v : ${vehicleList}" data-filter-row>
+                            <td th:text="${v.registrationNumber}"></td><td th:text="${v.vehicleType}"></td><td th:text="${v.location}"></td>
+                            <td th:text="${v.condition}"></td>
+                            <td>
+                                <span th:if="${v.driverDisplay != null and v.driverDisplay != 'Unassigned'}" style="font-weight:600; color:var(--text-main);" th:text="${v.driverDisplay}"></span>
+                                <span th:if="${v.driverDisplay == null or v.driverDisplay == 'Unassigned'}" class="badge" style="opacity:0.7;">Unassigned</span>
+                            </td>
+                            <td><span th:class="${v.operationalStatus == 'AVAILABLE' ? 'badge badge-green' : 'badge badge-red'}" th:text="${v.operationalStatus}"></span></td>
+                        </tr>
+                    </tbody>
+                </table></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

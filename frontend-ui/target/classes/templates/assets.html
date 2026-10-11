@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Equipment & Assets | Defense Logistics')}"></head>
+<body>
+    <div th:replace="~{fragments/layout :: page(~{::content}, 'assets')}">
+        <div th:fragment="content">
+            <div class="card" th:if="${session.role == 'ADMIN'}">
+                <div class="flex-header"><h3 class="card-title" style="margin:0;">Register New Equipment Asset</h3></div>
+                <form action="/assets/create" method="post" class="form-grid form-grid-wide">
+                    <div class="form-group" style="margin:0;"><label>Asset Code</label><input type="text" name="assetCode" class="form-control" required placeholder="MED-01"></div>
+                    <div class="form-group" style="margin:0;"><label>Item Name</label><input type="text" name="name" class="form-control" required placeholder="Field Medical Kit"></div>
+                    <div class="form-group" style="margin:0;">
+                        <label>Unit</label>
+                        <select name="unitId" class="form-control" required>
+                            <option value="">Select unit</option>
+                            <option th:each="unit : ${availableUnits}" th:value="${unit['id']}" th:text="${unit['name'] + ' (' + unit['code'] + ')'}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin:0;"><label>Category</label><select name="category" class="form-control"><option value="WEAPON">WEAPON</option><option value="COMM">COMM</option><option value="MEDICAL">MEDICAL</option><option value="TRANSPORT">TRANSPORT</option><option value="OTHER">OTHER</option></select></div>
+                    <div class="form-group" style="margin:0;"><label>Base / Storage</label><input type="text" name="location" class="form-control" required placeholder="Base Warehouse"></div>
+                    <div class="form-group" style="margin:0;"><label>Condition</label><select name="condition" class="form-control"><option value="NEW">NEW</option><option value="GOOD">GOOD</option><option value="FAIR">FAIR</option><option value="POOR">POOR</option><option value="BROKEN">BROKEN</option></select></div>
+                    <div class="form-group" style="margin:0;">
+                        <label>Availability</label>
+                        <select name="operationalStatus" class="form-control"><option value="AVAILABLE">AVAILABLE</option><option value="ALLOCATED">ALLOCATED</option></select>
+                    </div>
+                    <div class="form-group" style="margin:0;"><label>Assigned Personnel ID</label><input type="number" min="1" name="assignedPersonnelId" class="form-control" placeholder="Optional"></div>
+                    <button type="submit" class="btn btn-primary">Save Asset</button>
+                </form>
+            </div>
+
+            <div class="grid-3" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+                <div class="card stat-card">
+                    <h3 class="card-title">Available Equipment</h3>
+                    <div class="stat-value" th:text="${availableCount ?: assetList.size()}">0</div>
+                    <p class="stat-subtitle">Ready for immediate deployment</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="table-toolbar">
+                    <h3 class="card-title">Available Equipment Catalog</h3>
+                </div>
+                <div class="table-scroll"><table id="asset-table" class="table-dark">
+                    <thead>
+                        <tr>
+                            <th>Asset Code</th>
+                            <th>Equipment Name</th>
+                            <th>Category</th>
+                            <th>Current Location</th>
+                            <th>Condition</th>
+                            <th>Status</th>
+                            <th>Quantity Left</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="v : ${assetList}">
+                            <td th:text="${v['assetCode']}"></td>
+                            <td th:text="${v['name']}"></td>
+                            <td><span class="badge badge-yellow" th:text="${v['category']}"></span></td>
+                            <td th:text="${v['location']}"></td>
+                            <td th:text="${v['condition']}"></td>
+                            <td><span class="badge badge-green" th:text="${v['operationalStatus']}"></span></td>
+                            <td class="status-value" th:text="${v['quantityLeft'] ?: 1}"></td>
+                        </tr>
+                        <tr class="empty-state" th:if="${assetList == null or assetList.isEmpty()}"><td colspan="7">No available equipment assets found.</td></tr>
+                    </tbody>
+                </table></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

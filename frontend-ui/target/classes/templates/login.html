@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Login | Defense Logistics')}"></head>
+<body class="auth-page">
+    <div class="theme-switcher auth-theme-switcher" role="group" aria-label="Color theme">
+        <button type="button" class="theme-option" data-theme-choice="light">Light</button>
+        <button type="button" class="theme-option" data-theme-choice="dark">Dark</button>
+        <button type="button" class="theme-option" data-theme-choice="system">System</button>
+    </div>
+    <main class="auth-shell">
+        <section class="auth-intro" aria-label="Defense Logistics Overview">
+            <div>
+                <a class="brand" href="/"><span class="brand-mark">DL</span><span>DEF-<strong>LOGIX</strong><small>Defense Logistics</small></span></a>
+                <h1>Defense Logistics Operations Portal</h1>
+                <p>Authorized access for active military units, personnel roster, and supply coordination.</p>
+            </div>
+            <div class="auth-footnote">Authorized Personnel Access Only</div>
+        </section>
+        <section class="auth-card">
+            <p class="eyebrow">Secure Sign In</p>
+            <h2>Sign in to your account</h2>
+            <p>Enter your Service ID, Full Name, or Admin username along with your password to continue.</p>
+            <div th:if="${successMessage}" class="alert alert-success" role="status" th:text="${successMessage}"></div>
+            <div th:if="${errorMessage}" class="alert alert-error" role="alert" th:text="${errorMessage}"></div>
+            <div th:if="${param.error}" class="alert alert-error" role="alert">Invalid credentials. Check your username/Service ID and password.</div>
+            <form action="/login" method="post" class="auth-form">
+                <div class="form-group">
+                    <label>Service ID, Full Name, or Admin Username</label>
+                    <input type="text" name="username" class="form-control" required placeholder="e.g. admin, SN-12345, or John Doe" autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" class="form-control" required placeholder="Enter password (e.g. password or admin)" autocomplete="current-password">
+                </div>
+                <button type="submit" class="btn btn-primary auth-submit">Sign In</button>
+            </form>
+            <p class="auth-alt">Need a personnel workspace account? <a href="/signup">Request access</a></p>
+        </section>
+    </main>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('My Profile | Defense Logistics')}"></head>
+<body>
+    <div th:replace="~{fragments/layout :: page(~{::content}, 'my-status')}">
+        <div th:fragment="content">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow" th:text="${session.role == 'ADMIN' ? 'Command Administration' : 'Personnel File'}">Personnel File</p>
+                    <h2 th:text="${session.role == 'ADMIN' ? 'Administrator Profile' : 'My Profile & Service Status'}">My Profile &amp; Service Status</h2>
+                </div>
+                <span class="badge badge-green" th:text="${profile['accountStatus'] ?: 'ACTIVE'}">ACTIVE</span>
+            </div>
+
+            <!-- When User is an ADMIN: Show only the Administrator Profile card (No account service info, No unit assignment) -->
+            <div th:if="${session.role == 'ADMIN'}" class="admin-profile-view" style="max-width: 680px; margin: 20px auto 0;">
+                <section class="card profile-pic-card" style="padding: 32px 28px;">
+                    <h3 class="card-title" style="margin-bottom: 20px;">Command Administrator</h3>
+                    <div class="avatar-container">
+                        <div class="avatar-badge avatar-admin-badge" style="width: 136px; height: 136px; margin-bottom: 16px;">
+                            <svg class="avatar-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="50" cy="50" r="48" stroke="var(--accent-yellow)" stroke-width="2.5" fill="var(--bg-elevated)"/>
+                                <circle cx="50" cy="35" r="17" fill="var(--accent-blue)" opacity="0.9"/>
+                                <path d="M22 84 C22 62, 34 54, 50 54 C66 54, 78 62, 78 84 Z" fill="var(--accent-blue)" opacity="0.9"/>
+                                <!-- Administrator Star Crest -->
+                                <polygon points="50,60 53,69 62,69 55,74 58,83 50,78 42,83 45,74 38,69 47,69" fill="var(--accent-yellow)"/>
+                            </svg>
+                            <span class="avatar-status-pill badge-yellow" style="color: #000; font-weight: 900;">ADMIN</span>
+                        </div>
+                        <div class="avatar-details">
+                            <h3 style="margin: 0 0 6px; font-size: 1.55rem; color: var(--text-main);" th:text="${profile['fullName']}">System Administrator</h3>
+                            <p class="service-id-tag"><strong style="color: var(--accent-yellow);">SYSTEM ADMINISTRATOR</strong> &bull; <span th:text="${profile['username']}">admin</span></p>
+                        </div>
+                    </div>
+                    <div class="availability-info" style="width: 100%; border-top: 1px solid var(--border-color); padding-top: 20px; margin-top: 12px;">
+                        <p class="status-heading">Access Level &amp; Authority</p>
+                        <p class="profile-status" style="color: var(--accent-yellow); font-size: 1.75rem; margin: 8px 0 12px;">FULL COMMAND ACCESS</p>
+                        <p class="muted" style="margin: 0; line-height: 1.6;">Full administrative privileges are active. You have complete command authorization across all system modules: unit deployment, personnel rosters, equipment asset allocations, vehicle fleets, and supply request approvals.</p>
+                    </div>
+                </section>
+            </div>
+
+            <!-- When User is NOT an Admin: Show Account Information, Profile, and Unit Assignment -->
+            <div th:unless="${session.role == 'ADMIN'}">
+                <div class="profile-grid">
+                    <!-- Left container: Account & Service Details -->
+                    <section class="card">
+                        <h3 class="card-title">Account &amp; Service Information</h3>
+                        <dl class="intel-list">
+                            <div>
+                                <dt>Full Name</dt>
+                                <dd th:text="${profile['fullName']}">Officer</dd>
+                            </div>
+                            <div>
+                                <dt>Service ID</dt>
+                                <dd th:text="${profile['username']}">ID-0000</dd>
+                            </div>
+                            <div>
+                                <dt>Access Level</dt>
+                                <dd><span class="badge badge-blue" th:text="${profile['role']}">OFFICER</span></dd>
+                            </div>
+                            <div>
+                                <dt>Account Status</dt>
+                                <dd><span class="badge badge-green" th:text="${profile['accountStatus'] ?: 'ACTIVE'}">ACTIVE</span></dd>
+                            </div>
+                            <div>
+                                <dt>Unit Number</dt>
+                                <dd th:text="${profile['unitCode'] ?: 'UNASSIGNED'}">UNASSIGNED</dd>
+                            </div>
+                        </dl>
+                    </section>
+
+                    <!-- Right container: Profile Photo & Status -->
+                    <section class="card profile-pic-card">
+                        <h3 class="card-title" style="margin-bottom: 14px;">Officer Profile</h3>
+                        <div class="avatar-container">
+                            <div class="avatar-badge">
+                                <svg class="avatar-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="50" cy="50" r="48" stroke="var(--accent-green)" stroke-width="2.5" fill="var(--bg-elevated)"/>
+                                    <circle cx="50" cy="35" r="17" fill="var(--accent-blue)" opacity="0.85"/>
+                                    <path d="M22 84 C22 62, 34 54, 50 54 C66 54, 78 62, 78 84 Z" fill="var(--accent-blue)" opacity="0.85"/>
+                                    <path d="M44 65 L50 71 L56 65" stroke="var(--accent-yellow)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M44 71 L50 77 L56 71" stroke="var(--accent-yellow)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span class="avatar-status-pill" th:text="${profile['availabilityStatus'] ?: 'ACTIVE'}">ACTIVE</span>
+                            </div>
+                            <div class="avatar-details">
+                                <h4 th:text="${profile['fullName']}">Officer</h4>
+                                <p class="service-id-tag"><span th:text="${profile['role']}">MEMBER</span> &bull; <span th:text="${profile['username']}">ID</span></p>
+                            </div>
+                        </div>
+                        <div class="availability-info">
+                            <p class="status-heading">Deployment Status</p>
+                            <p class="profile-status" th:text="${profile['availabilityStatus'] ?: 'AVAILABLE'}">AVAILABLE</p>
+                            <p class="muted" th:if="${!profile['personnelLinked']}">Official military record unlinked. Contact administrator to synchronize unit records.</p>
+                            <p class="muted" th:if="${profile['personnelLinked']}">Service record synchronized with unit command roster.</p>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Unit Assignment Section -->
+                <section class="card" style="margin-top: 18px;">
+                    <h3 class="card-title">Current Unit Assignment</h3>
+                    <dl class="intel-list">
+                        <div>
+                            <dt>Assigned Unit</dt>
+                            <dd th:text="${profile['unitName'] + ' (' + profile['unitCode'] + ')'}">Central Command</dd>
+                        </div>
+                        <div>
+                            <dt>Unit Code</dt>
+                            <dd th:text="${profile['unitCode']}">HQ-01</dd>
+                        </div>
+                        <div>
+                            <dt>Base Location</dt>
+                            <dd th:text="${profile['unitLocation']}">Main Headquarters</dd>
+                        </div>
+                        <div>
+                            <dt>Station / Posting</dt>
+                            <dd th:text="${profile['posting']}">Station Headquarters</dd>
+                        </div>
+                        <div>
+                            <dt>Operational Role</dt>
+                            <dd th:text="${profile['personnelRole']}">Operations Officer</dd>
+                        </div>
+                    </dl>
+                </section>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
